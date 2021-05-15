@@ -26,28 +26,61 @@ bold=$'\033[1;31m'
 reset=$'\033[0;39m'
 
 # Config
-toolbox_path="$HOME/42toolbox"                       #=> 42toolbox path. See https://github.com/alexandregv/42toolbox
+toolbox_path=$(pwd)                     			 #=> 42toolbox path. See https://github.com/alexandregv/42toolbox
 bluetooth_device=""                                  #=> Bluetooth device name. Empty = skip bluetooth setup
-init_docker=true                                     #=> Init Docker for Mac? See https://github.com/alexandregv/42toolbox/blob/master/init_docker.sh
+init_docker=false                                    #=> Init Docker for Mac? See https://github.com/alexandregv/42toolbox/blob/master/init_docker.sh
 init_docker_path="$toolbox_path/init_docker.sh"      #=> Location of init_docker.sh file. See https://github.com/alexandregv/42toolbox/blob/master/init_docker.sh
 install_apps=true                                    #=> Install desired apps if they are missing?
 start_apps=true                                      #=> Start apps?
 update_brew=false                                    #=> Update Homebrew (itself)?
-upgrade_brew_formulas=true                           #=> Upgrade Homebrew formulas (packages)?
-clean_disk=true                                      #=> Clean disk (deletes ~/Library/Caches, does a brew cleanup, etc)?
-start_RP42=true                                      #=> Start RP42 (Discord Rich Presence for 42)? See https://github.com/alexandregv/RP42
+upgrade_brew_formulas=false                          #=> Upgrade Homebrew formulas (packages)?
+clean_disk=false                                     #=> Clean disk (deletes ~/Library/Caches, does a brew cleanup, etc)?
+start_RP42=false                                     #=> Start RP42 (Discord Rich Presence for 42)? See https://github.com/alexandregv/RP42
 RP42_path="/sgoinfre/goinfre/Perso/aguiot--/public/" #=> Location of RP42. You should not edit this unless you downloaded it manually. See https://github.com/alexandregv/RP42/blob/master/README.md#installation
-open_system_preferences=true                         #=> Open System Preferences at the end? You could need it to edit your keyboard/screen settings, etc.
+open_system_preferences=false                         #=> Open System Preferences at the end? You could need it to edit your keyboard/screen settings, etc.
 send_notification=true                               #=> Send a notification when job is done?
+
+#extras gsanchez
+goinfre_path="/goinfre/${USER}"
+config_goinfre=true
+install_brew=true
+interface_set_up=true
+
+# Apple interface set up
+if [ "$interface_set_up" ]; then
+	osascript <<'END'
+	tell application "System Events"
+		tell appearance preferences
+			set properties to {dark mode: true,highlight color:purple}
+		end tell
+	end tell
+END
+fi
+
+#config_goinfre=true
+dir_in_goinfre=(".brew" ".vscode" "Library/Application Support/Code" "Library/Application Support/Slack")
+
+if [ "$config_goinfre" ]; then
+	for dir in "${dir_in_goinfre[@]}"; do
+		if [ ! -d "${goinfre_path}/${dir}" ]; then
+			new_dir=${goinfre_path}/${dir}
+			mkdir -p "${new_dir}"
+			echo "Created ${new_dir}"
+		fi
+	done
+fi
+
+#install_brew
+if [ "$install_brew" ]; then
+	if [ ! -x "$(command -v brew)" ]; then 
+		git clone --depth=1 https://github.com/Homebrew/brew ~/.brew/
+	fi
+fi
 
 # List your desired apps below, used by $install_apps and $start_apps.
 declare -a desired_apps=(
-	"Discord"
-	"Docker"
-	"Spotify"
-	"Spectacle"
+	"Visual Studio Code"
 	"Slack"
-	"iTerm"
 )
 
 ################################################################################
